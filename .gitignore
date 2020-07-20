@@ -1,0 +1,11 @@
+*.pyc
+*.swp
+*~
+.coverage
+.mypy_cache/
+.pytest_cache/
+MANIFEST
+__pycache__/
+build/
+dist/
+py3/

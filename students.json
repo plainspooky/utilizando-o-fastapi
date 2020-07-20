@@ -1,0 +1,92 @@
+[
+  {
+      "id": 1,
+      "name": "Agatha da Costa",
+      "address": "Via Cau\u00e3 Rezende",
+      "neighbour": "Para\u00edso",
+      "city": "da Mata",
+      "state": "S\u00e3o Paulo",
+      "postal_code": "29093-532"
+  },
+  {
+      "id": 2,
+      "name": "Ben\u00edcio das Neves",
+      "address": "Rua de da Paz, 86",
+      "neighbour": "Capit\u00e3o Eduardo",
+      "city": "Pereira de Rodrigues",
+      "state": "Rio de Janeiro",
+      "postal_code": "83392-182"
+  },
+  {
+      "id": 3,
+      "name": "J\u00falia da Paz",
+      "address": "Praia Moraes, 25",
+      "neighbour": "Conjunto Taquaril",
+      "city": "Jesus de Goi\u00e1s",
+      "state": "Goi\u00e1s",
+      "postal_code": "15319-202"
+  },
+  {
+      "id": 4,
+      "name": "Dr. Pedro Lucas Peixoto",
+      "address": "Esplanada Davi Luiz Freitas, 4",
+      "neighbour": "Virg\u00ednia",
+      "city": "Pires de Minas",
+      "state": "Distrito Federal",
+      "postal_code": "24123-321"
+  },
+  {
+      "id": 5,
+      "name": "Sophia Ara\u00fajo",
+      "address": "Vila Beatriz Ramos, 125",
+      "neighbour": "Ch\u00e1cara Leonina",
+      "city": "Lima",
+      "state": "Minas Gerais",
+      "postal_code": "32024-590"
+  },
+  {
+      "id": 6,
+      "name": "Esther Freitas",
+      "address": "P\u00e1tio Foga\u00e7a, 52",
+      "neighbour": "Bra\u00fanas",
+      "city": "da Rocha do Campo",
+      "state": "Amap\u00e1",
+      "postal_code": "43302-598"
+  },
+  {
+      "id": 7,
+      "name": "Camila Rocha",
+      "address": "Fazenda Santos, 8",
+      "neighbour": "Serra",
+      "city": "Correia das Flores",
+      "state": "Santa Catarina",
+      "postal_code": "76917-907"
+  },
+  {
+      "id": 8,
+      "name": "Ana J\u00falia Porto",
+      "address": "Lagoa Sarah Moraes, 58",
+      "neighbour": "Monte S\u00e3o Jos\u00e9",
+      "city": "Lopes",
+      "state": "Minas Gerais",
+      "postal_code": "82636-495"
+  },
+  {
+      "id": 9,
+      "name": "Pietra Campos",
+      "address": "Favela Nat\u00e1lia Caldeira, 88",
+      "neighbour": "Xodo-Marize",
+      "city": "Farias",
+      "state": "Paran\u00e1",
+      "postal_code": "33447-453"
+  },
+  {
+      "id": 10,
+      "name": "Jo\u00e3o Felipe Carvalho",
+      "address": "Lago Davi Sales, 60",
+      "neighbour": "Renascen\u00e7a",
+      "city": "Cunha",
+      "state": "Mato Grosso do Sul",
+      "postal_code": "56446-679"
+  }
+]
