@@ -3,14 +3,29 @@ Arquivo principal da API.
 """
 import json
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from fastapi import FastAPI, HTTPException, status
 
 app = FastAPI()
 
-# carrega o "Banco de Dados" (basicamente um arquivo JSON)
-students = json.load(open("students.json", "r"))
+# tipos customizados usados neste módulo
+StudentType = Dict[str, Union[float, int, str]]
+StudentListType = List[StudentType]
+
+# carrega o "Banco de Dados" (basicamente lê o arquivo JSON)
+students: StudentListType = json.load(open("students.json", "r"))
+
+
+def retrieve_student(student_id: int) -> Optional[StudentType]:
+    """
+    Recupera no "Banco de Dados" um estudante específico, recebe o _id_
+    em `student_id`.
+    """
+    result: StudentListType = list(
+        filter(lambda i: i.get("id") == student_id, students)
+    )
+    return result[0] if result else None
 
 
 @app.get("/health/")
@@ -24,7 +39,7 @@ def alive() -> Dict[str, datetime]:
 
 
 @app.get("/students/")
-def get_all_students() -> List[Dict[str, Union[float, int, str]]]:
+def get_all_students() -> StudentListType:
     """
     Retorna todos os estudantes armazenados.
     """
@@ -38,14 +53,14 @@ def get_all_students() -> List[Dict[str, Union[float, int, str]]]:
 
 
 @app.get("/students/{student_id}/")
-def get_student(student_id: int) -> Dict[str, Union[float, int, str]]:
+def get_student(student_id: int) -> StudentType:
     """
     Retorna os dados do estudante, recebe o _id_ do estudante em `student_id`
     e retorna as informações armazenadas ou gera uma exceção caso não seja
     encontrado.
     """
-    if response := list(filter(lambda i: i.get("id") == student_id, students)):
-        return response[0]
+    if student := retrieve_student(student_id):
+        return student
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -54,14 +69,14 @@ def get_student(student_id: int) -> Dict[str, Union[float, int, str]]:
 
 
 @app.delete("/students/{student_id}/")
-def delete_student(student_id: int) -> Dict[str, bool]:
+def delete_student(student_id: int):
     """
-    Remove um estudante do banco de dados, erecebe o _id_ do estudante em
+    Remove um estudante do banco de dados, recebe o _id_ do estudante em
     `student_id` e retorna uma mensagem de sucesso, caso contrário gera uma
     exceção de não encontrado.
     """
-    if response := list(filter(lambda i: i.get("id") == student_id, students)):
-        del students[students.index(response[0])]
+    if student := retrieve_student(student_id):
+        del students[students.index(student)]
         return {"success": True}
 
     raise HTTPException(
