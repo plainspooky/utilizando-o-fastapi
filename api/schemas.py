@@ -6,7 +6,7 @@ from typing import Any
 
 from pydantic import BaseModel, validator
 
-from enumerators import StatesBrEnum as StatesEnum
+from .enumerators import StatesBrEnum as StatesEnum
 
 POSTAL_CODE_REGEX = re.compile("[0-9]{5}\\-[0-9]{3}")
 
