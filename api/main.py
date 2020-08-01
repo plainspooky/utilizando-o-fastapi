@@ -1,17 +1,23 @@
 """
-Arquivo principal da API. (main.py)
+Arquivo principal da API contendo os métodos HTTP implementados.
 """
 from datetime import datetime
-from typing import Dict, Generator, List
+from typing import Dict, Generator
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
-from .crud import create_student, retrieve_all_students, retrieve_student
+from .crud import (
+    create_student,
+    remove_student,
+    retrieve_all_students,
+    retrieve_student,
+    update_student,
+)
 from .database import SessionLocal, engine
-from .datatypes import StudentListType, StudentType
+from .datatypes import StudentType
 from .models import Base
-from .schemas import CreateStudentSchema, StudentSchema, UpdateStudentSchema
+from .schemas import CreateStudentSchema, UpdateStudentSchema
 
 # instancia o FastAPI
 app = FastAPI()
@@ -30,32 +36,6 @@ def get_db() -> Generator:
         db.close()
 
 
-# carrega o "Banco de Dados" (basicamente lê o arquivo JSON)
-# students: StudentListType = json.load(open("students.json", "r"))
-#
-# def retrieve_student(student_id: int) -> Optional[StudentType]:
-#     """
-#     (provisório) Recupera no "Banco de Dados" um estudante específico,
-#     recebe o _id_ em `student_id`.
-#     """
-#     if result := list(filter(lambda i: i.get("id") == student_id, students)):
-#         return result[0]
-#
-#     raise HTTPException(
-#         status_code=status.HTTP_404_NOT_FOUND,
-#         detail=f"Estudante de 'id={student_id}' não encontrado.",
-#     )
-#
-#
-# def get_max() -> int:
-#     """
-#     (provisório) Retorna o maior valor de _id_ do "Banco de Dados".
-#     """
-#     max_student = max(students, key=lambda i: i.get("id", 0))
-#
-#     return max_student.get("id", 0)
-
-
 @app.get("/health/")
 def alive() -> Dict[str, datetime]:
     """
@@ -66,13 +46,14 @@ def alive() -> Dict[str, datetime]:
     return {"timestamp": datetime.now()}
 
 
-@app.get("/students/", response_model=List[StudentSchema])
-def get_all_students(db: Session = Depends(get_db)) -> StudentListType:
+@app.get("/students/", status_code=200)
+def get_all_students(db: Session = Depends(get_db)) -> Generator:
     """
     Retorna todos os estudantes armazenados.
     """
-    if response := retrieve_all_students(db):
-        return response
+
+    if result := retrieve_all_students(db):
+        return result
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -80,15 +61,15 @@ def get_all_students(db: Session = Depends(get_db)) -> StudentListType:
     )
 
 
-@app.get("/students/{student_id}/", response_model=StudentSchema)
+@app.get("/students/{student_id}/", status_code=200)
 def get_student(student_id: int, db: Session = Depends(get_db)) -> StudentType:
     """
     Retorna os dados do estudante, recebe o _id_ do estudante em `student_id`
     e retorna as informações armazenadas ou gera uma exceção caso não seja
     encontrado.
     """
-    if response := retrieve_student(db, student_id):
-        return response
+    if result := retrieve_student(db, student_id):
+        return result
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -96,57 +77,54 @@ def get_student(student_id: int, db: Session = Depends(get_db)) -> StudentType:
     )
 
 
-@app.delete("/students/{student_id}/")
-def delete_student(student_id: int, db: Session = Depends(get_db)) -> None:
+@app.delete("/students/{student_id}/", status_code=status.HTTP_204_NO_CONTENT)
+def delete_student(student_id: int, db: Session = Depends(get_db)):
     """
     Remove um estudante do banco de dados, recebe o _id_ do estudante em
     `student_id` e retorna uma mensagem de sucesso, caso contrário gera uma
     exceção de não encontrado.
     """
-    if response := get_student(db, student_id):
-        db.delete(response)
-        db.commit()
+    if remove_student(db, student_id):
+        ...
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Estudante de 'id={student_id}' não encontrado.",
+        )
 
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Estudante de 'id={student_id}' não encontrado.",
-    )
 
-
-@app.post("/students/", response_model=StudentSchema)
+@app.post("/students/", status_code=status.HTTP_201_CREATED)
 def post_student(
-    student: CreateStudentSchema, db: Session = Depends(get_db)
+    student: CreateStudentSchema,
+    response: Response,
+    db: Session = Depends(get_db),
 ) -> StudentType:
     """
     Insere um novo estudante no banco de dados, recebe todos os campos
     necessários, valida e insere no banco de dados. Retorna o registro
     inserido acrescido do seu `id`.
     """
-    if response := create_student(db, student):
-        return response
-
-    return response
+    if result := create_student(db, student):
+        return result
 
 
-@app.put("/students/{student_id}", response_model=StudentSchema)
-def put_student(student_id: int, student: UpdateStudentSchema) -> StudentType:
+@app.put("/students/{student_id}")
+def put_student(
+    student_id: int,
+    student: UpdateStudentSchema,
+    db: Session = Depends(get_db),
+) -> StudentType:
     """
     Atualiza os dados de um estudante, recebe o _id_  em `student_id` e a
     lista de campos a modificar dentro do JSON (campos com valor `None`
     serão ignorados).
     """
-    ...
-    # if old_student := retrieve_student(student_id):
-    #     updated_student = {
-    #         **old_student,
-    #         **{key: value for key, value in student if value},
-    #     }
-    #
-    #     students[students.index(old_student)] = updated_student
-    #
-    #     return updated_student
-    #
-    # raise HTTPException(
-    #     status_code=status.HTTP_404_NOT_FOUND,
-    #     detail=f"Estudante de 'id={student_id}' não encontrado.",
-    # )
+    if result := update_student(
+        db, student_id, {key: value for key, value in student if value}
+    ):
+        return result
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Estudante de 'id={student_id}' não encontrado.",
+    )

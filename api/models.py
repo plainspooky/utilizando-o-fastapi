@@ -1,5 +1,5 @@
 """
-Modelos de Dados (models.py)
+Os modelos do banco de dados utilizando a descrição do SQLAlchemy.
 """
 from sqlalchemy import Column, Integer, String
 
@@ -14,7 +14,7 @@ class Student(Base):
     # nome da tabela
     __tablename__ = "students"
 
-    # campos (como definidos em "schemas.py")
+    # campos (tal qual definidos em "schemas.py")
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     address = Column(String)

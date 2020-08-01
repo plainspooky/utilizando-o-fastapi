@@ -1,5 +1,5 @@
 """
-Leiaute dos dados (schema.py)
+Leiaute dos dados utilizados pelo pydantic para validação dos mesmos.
 """
 import re
 from typing import Any
@@ -22,7 +22,7 @@ class StudentBaseSchema(BaseModel):
     city: str
     postal_code: str
 
-    @validator("postal_code")
+    @validator("postal_code", allow_reuse=True)
     def validate_postal_code(cls, v: str, **kwargs: int) -> str:
         """
         Verifica se o CEP tem cinco números, hífen e três números.
@@ -63,7 +63,7 @@ class UpdateStudentSchema(StudentBaseSchema):
     state: str = ""
     postal_code: str = ""
 
-    @validator("state")
+    @validator("state", allow_reuse=True)
     def validate_state(cls, v: Any, **kwargs: int) -> str:
         """
         Valida a unidade da faderação, rem

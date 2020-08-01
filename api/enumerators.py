@@ -1,14 +1,14 @@
 """
-Enumerações (enumerators.py)
+As enumerações que não precisam estar no banco de dados estão aqui.
 """
 from enum import Enum
 
 
 class StatesAoEnum(str, Enum):
     """
-    Lista das províncias angolanas e suas respectivas siglas.
+    Lista das províncias angolanas com suas respectivas siglas.
 
-    fonte: https://pt.wikipedia.org/wiki/Prov%C3%ADncias_de_Angola
+    fonte: [Wikipédia](https://pt.wikipedia.org/wiki/Prov%C3%ADncias_de_Angola)
     """
 
     bgo = "Bengo"
