@@ -1,7 +1,7 @@
 """
 Os modelos do banco de dados utilizando a descrição do SQLAlchemy.
 """
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String  # type: ignore
 
 from .database import Base
 

@@ -4,7 +4,7 @@ invés de consultas escritas diretamente em SQL.
 """
 from typing import Generator
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session  # type: ignore
 
 from .datatypes import UpdateStudentValuesType
 from .models import Student
@@ -14,7 +14,7 @@ from .schemas import CreateStudentSchema, StudentSchema
 students = Student
 
 
-def create_student(db: Session, student: CreateStudentSchema) -> StudentSchema:
+def create_student(db: Session, student: CreateStudentSchema):
     """
     Cria um novo estudante a partir dos dados enviados via API.
     """
@@ -23,8 +23,9 @@ def create_student(db: Session, student: CreateStudentSchema) -> StudentSchema:
     db.add(new_student)
     db.commit()
 
-    # recarrega os dados do estudante e envia de volta...
+    # recarrega os dados do estudante antes de envi=a-lo de volta
     db.refresh(new_student)
+
     return new_student
 
 
@@ -48,12 +49,16 @@ def update_student(
     db: Session, student_id: int, values: UpdateStudentValuesType
 ):
     """
-    Atualiza o registro de um estui
+    Atualiza o registro de um estudante a partir do seu _id_ usando os
+    novos valores em `values`.
     """
-    # pega o estudante com o id informado
-    if student := db.query(students).filter(students.id == student_id).first():
+    # verifica se o estudante existe...
+    if student := retrieve_student(db, student_id):
+        # altera os valores e submete as alterações
         db.query(students).filter(students.id == student_id).update(values)
         db.commit()
+
+        # atualiza o conteúdo antes de enviá-lo de volta
         db.refresh(student)
 
         return student
@@ -63,13 +68,14 @@ def remove_student(db: Session, student_id: int) -> bool:
     """
     Remove o registro de um estudate a partir do seu _id_.
     """
-    # pega o estudante com o id informado, se existe o apaga
-    if student := db.query(students).filter(students.id == student_id).first():
+    # verifica se o estudante existe...
+    if student := retrieve_student(db, student_id):
+        # daí o apaga do banco de dados
         db.delete(student)
         db.commit()
 
         # retorna `True`, estudante exisita e foi apagado
         return True
 
-    # retorna ``
+    # retorna `False`
     return False

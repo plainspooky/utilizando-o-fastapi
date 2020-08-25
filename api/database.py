@@ -5,9 +5,9 @@ alterar a _string_ de conexão vá em `config.py`.
 Baseado em [exemplo](https://fastapi.tiangolo.com/tutorial/sql-databases/)
 do próprio FastAPI.
 """
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine  # type: ignore
+from sqlalchemy.ext.declarative import declarative_base  # type: ignore
+from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from .config import SQLALCHEMY_DATABASE_ARGS, SQLALCHEMY_DATABASE_URL
 
