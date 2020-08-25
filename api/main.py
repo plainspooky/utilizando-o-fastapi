@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Dict, Generator
 
 from fastapi import Depends, FastAPI, HTTPException, Response, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session  # type: ignore
 
 from .crud import (
     create_student,
@@ -14,10 +14,9 @@ from .crud import (
     retrieve_student,
     update_student,
 )
-from .database import SessionLocal, engine
+from .database import Base, SessionLocal, engine
 from .datatypes import StudentType
-from .models import Base
-from .schemas import CreateStudentSchema, UpdateStudentSchema
+from .schemas import CreateStudentSchema, StudentSchema, UpdateStudentSchema
 
 # instancia o FastAPI
 app = FastAPI()
@@ -46,7 +45,7 @@ def alive() -> Dict[str, datetime]:
     return {"timestamp": datetime.now()}
 
 
-@app.get("/students/", status_code=200)
+@app.get("/students/", status_code=status.HTTP_200_OK)
 def get_all_students(db: Session = Depends(get_db)) -> Generator:
     """
     Retorna todos os estudantes armazenados.
@@ -61,7 +60,9 @@ def get_all_students(db: Session = Depends(get_db)) -> Generator:
     )
 
 
-@app.get("/students/{student_id}/", status_code=200)
+@app.get(
+    "/students/{student_id}/", status_code=status.HTTP_200_OK,
+)
 def get_student(student_id: int, db: Session = Depends(get_db)) -> StudentType:
     """
     Retorna os dados do estudante, recebe o _id_ do estudante em `student_id`
@@ -78,26 +79,25 @@ def get_student(student_id: int, db: Session = Depends(get_db)) -> StudentType:
 
 
 @app.delete("/students/{student_id}/", status_code=status.HTTP_204_NO_CONTENT)
-def delete_student(student_id: int, db: Session = Depends(get_db)):
+def delete_student(student_id: int, db: Session = Depends(get_db)) -> None:
     """
     Remove um estudante do banco de dados, recebe o _id_ do estudante em
     `student_id` e retorna uma mensagem de sucesso, caso contrário gera uma
     exceção de não encontrado.
     """
-    if remove_student(db, student_id):
-        ...
-    else:
+    if not remove_student(db, student_id):
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Estudante de 'id={student_id}' não encontrado.",
         )
 
 
-@app.post("/students/", status_code=status.HTTP_201_CREATED)
+@app.post(
+    "/students/", status_code=status.HTTP_201_CREATED,
+)
 def post_student(
-    student: CreateStudentSchema,
-    response: Response,
-    db: Session = Depends(get_db),
+    student: CreateStudentSchema, db: Session = Depends(get_db),
 ) -> StudentType:
     """
     Insere um novo estudante no banco de dados, recebe todos os campos
@@ -107,8 +107,12 @@ def post_student(
     if result := create_student(db, student):
         return result
 
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-@app.put("/students/{student_id}")
+
+@app.put(
+    "/students/{student_id}", status_code=status.HTTP_201_CREATED,
+)
 def put_student(
     student_id: int,
     student: UpdateStudentSchema,
