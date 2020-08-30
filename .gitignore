@@ -7,5 +7,6 @@
 MANIFEST
 __pycache__/
 build/
+db.sqlite3
 dist/
 py3/
