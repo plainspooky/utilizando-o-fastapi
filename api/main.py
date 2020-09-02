@@ -111,7 +111,7 @@ def post_student(
 
 
 @app.put(
-    "/students/{student_id}", status_code=status.HTTP_201_CREATED,
+    "/students/{student_id}/", status_code=status.HTTP_201_CREATED,
 )
 def put_student(
     student_id: int,

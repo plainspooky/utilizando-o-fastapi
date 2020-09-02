@@ -50,7 +50,7 @@ class StatesBrEnum(str, Enum):
     ms = "Mato Grosso do Sul"
     mg = "Minas Gerais"
     pa = "Pará"
-    pb = "Paraiba"
+    pb = "Paraíba"
     pr = "Paraná"
     pe = "Pernambuco"
     pi = "Piauí"
