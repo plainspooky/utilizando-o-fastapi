@@ -35,7 +35,8 @@ pip install -r requirements.txt
 
 # Banco de dados
 
-A aplicação usa o **SQLite3** e criará automaticamente o banco de dados mas desejando uma versão já populada, use:
+A aplicação usa o **SQLite3** e criará automaticamente o banco de dados mas
+desejando uma versão já populada, use:
 
 ``` shell
 sqlite3 db.sqlite3 < examples/students.sql
@@ -46,8 +47,10 @@ sqlite3 db.sqlite3 < examples/students.sql
 Para executar o servidor use:
 
 ``` shell
-uvicorn main:app
+FASTAPI__DATABASE='sqlite:///db.sqlite3' uvicorn main:app
 ```
+
+A varíavel `FASTAPI__DATABASE` contém a URL de conexão com o banco de dados.
 
 O servidor estará escutando a porta 8000, para testá-lo use:
 
