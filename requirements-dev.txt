@@ -1,8 +1,10 @@
+Faker==4.1.2
 black==19.10b0
 devtools==0.5.1
 flake8==3.8.3
 isort==5.1.4
 mypy==0.782
-pytest==5.4.3
+pdoc3==0.8.4
 pytest-cov==2.10.1
 pytest-sugar==0.9.4
+pytest==5.4.3
