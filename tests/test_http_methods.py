@@ -1,48 +1,16 @@
 """
-Testes
+Testes unitários da API.
 """
-from typing import Dict
-
-import pytest
-from faker import Faker
 from fastapi.testclient import TestClient
 
 from api import app
 from api.schemas import CreateStudentSchema, UpdateStudentSchema
 
-StudentType = Dict[str, str]
+from .datatypes import StudentType
+from .fixtures import new_student, student
 
-
+# instancia a API dentro das rotinas de teste do FastAPI
 client = TestClient(app)
-fake = Faker(["pt-BR"])
-
-
-@pytest.fixture(scope="function")
-def student() -> StudentType:
-    """
-    Cria um conjunto completo de dados de estudante.
-    """
-    # algumas vezes o 'postcode' não põe "-"...
-    postcode = fake.postcode()
-
-    return {
-        "name": fake.name(),
-        "address": fake.street_address(),
-        "neighbour": fake.neighborhood(),
-        "city": fake.city(),
-        "state": fake.state(),
-        "postal_code": postcode[0:5] + "-" + postcode[-3:],
-    }
-
-
-@pytest.fixture(scope="function")
-def new_student() -> StudentType:
-    """
-    Cria um novo nome de estudante.
-    """
-    return {
-        "name": fake.name(),
-    }
 
 
 class TestStudentsApi:
@@ -53,7 +21,7 @@ class TestStudentsApi:
 
     def test_health(self) -> None:
         """
-        Verifica se `/health/` retorna um _timestamp_.
+        Verifica se `/health/` retorna um _timestamp_ ao ser consultado.
         """
         response = client.get("/health/")
 
@@ -63,7 +31,8 @@ class TestStudentsApi:
 
     def test_success_create_student(self, student: StudentType) -> None:
         """
-        Verifica se um novo estudante é corretamento criado.
+        Verifica se um novo estudante é corretamento criado, os dados do
+        estudante devem conter o campo "id".
         """
         response = client.post("/students/", json=student)
 
@@ -73,8 +42,9 @@ class TestStudentsApi:
 
     def test_success_to_retrieve_student(self, student: StudentType) -> None:
         """
-        Vertifica se as informações de um estudante são corretamente
-        recuperadas.
+        Vertifica se as informações de estudante são corretamente
+        recuperadas. Um novo estudante é inserido para eu ter certeza
+        de que há ao menos alguém para recuperar.
         """
         # insere um estudante e recupera seu 'id'...
         data = client.post("/students/", json=student)
@@ -88,13 +58,17 @@ class TestStudentsApi:
 
     def test_fail_to_retrieve_student(self, student: StudentType) -> None:
         """
+        Verifica se a tentativa de recuperar um estudante que não existe
+        retorna o status 404 do HTTP.
         """
         response = client.get(f"/students/0/")
+
         assert response.status_code == 404
 
     def test_success_retrieve_all_students(self, student: StudentType) -> None:
         """
-        Vertifica se as informações de tofod os estudantes são recuperadas.
+        Vertifica se todos os estudantes são recuperadas, ao menos um
+        estudante é criado para garantir que exista algo na base de dados.
         """
         __ = client.post("/students/", json=student)
 
@@ -119,58 +93,30 @@ class TestStudentsApi:
 
     def test_fail_update_student(self, new_student: StudentType) -> None:
         """
-        Verifica se as informações do estudante são corretamente alteradas.
+        Verifica se a tentativa de alterar um estudante que não existe
+        retorna o status 404 do HTTP. Lembrando que a validação está por
+        conta do pydantic.
         """
         response = client.put(f"/students/0/", json=new_student)
 
         assert response.status_code == 404
 
-    def test_delete_student(self, student: StudentType) -> None:
+    def test_success_delete_student(self, student: StudentType) -> None:
         """
-        Verifica se as informações do estudante são removidas.
+        Verifica se as informações do estudante são removidas
+        corretamente.
         """
         data = client.post("/students/", json=student)
         student_id = data.json().get("id")
 
-        print("->", data)
-
         pass_response = client.delete(f"/students/{student_id}/")
         assert pass_response.status_code == 204
 
-        fail_response = client.delete(f"/students/{student_id}/")
-        assert fail_response.status_code == 404
-
-
-class TestSchema:
-    """
-    Testa
-    """
-
-    def test_postal_code_validation(self, student: StudentType) -> None:
+    def test_fail_delete_student(self) -> None:
         """
+        Verifica se a tentativa de remoer um estudante que não existe
+        retorna o status 404 do HTTP.
         """
-        try:
-            student["postal_code"] = ""
-            __ = CreateStudentSchema(**student)
-        except ValueError:
-            assert True
-        else:
-            assert False
+        response = client.delete("/students/0/")
 
-    def test_state_validation(self, student: StudentType) -> None:
-        """
-        """
-        print(student)
-        new_student = CreateStudentSchema(**student)
-
-        try:
-            new_student_dict = new_student.dict()
-            new_student_dict["state"] = "Guanabara"
-
-            updated_student = UpdateStudentSchema(**new_student_dict)
-
-        except ValueError:
-            assert True
-
-        else:
-            assert False
+        assert response.status_code == 404
