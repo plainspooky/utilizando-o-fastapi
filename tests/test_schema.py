@@ -4,7 +4,7 @@ Testes unitários do _schema_ de dados da API.
 from api.schemas import CreateStudentSchema, UpdateStudentSchema
 
 from .datatypes import StudentType
-from .fixtures import student
+from .fixtures import student  # noqa: F401
 
 
 class TestStudentchema:
@@ -19,12 +19,12 @@ class TestStudentchema:
     valid_postal = ["99999-999"]
     invalid_postal = ["99999", "999-999", ""]
 
-    def test_sucess_student_validation(self, student: StudentType) -> None:
+    def test_success_student_validation(self, student: StudentType) -> None:
         """
         Verifica a validação de dados para um novo estudante.
         """
         try:
-            new_student = CreateStudentSchema(**student)
+            __ = CreateStudentSchema(**student)
 
         except ValueError:
             assert False
@@ -37,9 +37,9 @@ class TestStudentchema:
         Verifica a validação de dados para um novo estudante.
         """
         try:
-            student["postal_code"] = "99999"
+            student["postal_code"] = self.invalid_postal[0]
             student["state"] = self.invalid_state
-            new_student = CreateStudentSchema(**student)
+            __ = CreateStudentSchema(**student)
 
         except ValueError:
             assert True
@@ -82,7 +82,7 @@ class TestStudentchema:
             new_student_dict = new_student.dict()
             new_student_dict["state"] = self.invalid_state
 
-            updated_student = UpdateStudentSchema(**new_student_dict)
+            __ = UpdateStudentSchema(**new_student_dict)
 
         except ValueError:
             assert True

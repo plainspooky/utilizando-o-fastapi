@@ -31,7 +31,7 @@ def student() -> StudentType:
 
 
 @pytest.fixture(scope="function")
-def new_student() -> StudentType:
+def student_name() -> StudentType:
     """
     Cria um novo nome de estudante cada vez que uma função/método de
     testes for executado (`scope="function"`).
