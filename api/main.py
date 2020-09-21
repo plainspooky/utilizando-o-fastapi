@@ -57,7 +57,7 @@ def get_all_students(db: Session = Depends(get_db)) -> Generator:
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Não existem estudantes cadastrados.",
-    )
+    )  # pragma: nocover
 
 
 @app.get(
@@ -107,7 +107,9 @@ def post_student(
     if result := create_student(db, student):
         return result
 
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST
+    )  # pragma: nocover
 
 
 @app.put(
