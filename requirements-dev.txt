@@ -1,5 +1,5 @@
 Faker==4.1.2
-black==19.10b0
+black==24.3.0
 devtools==0.5.1
 flake8==3.8.3
 isort==5.1.4
